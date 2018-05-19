@@ -41,6 +41,13 @@ public class WebDataAcquirerJSON implements WebDataAcquirer
 		return this;
 	}
 
+	public Object getElement( String query )
+	{
+		DataSelectorMap dataSelectorMap = new DataSelectorMap( document );
+
+		return dataSelectorMap.getElement( query );
+	}
+
 	@Override
 	public String getValue( String query )
 	{
@@ -48,43 +55,43 @@ public class WebDataAcquirerJSON implements WebDataAcquirer
 
 		return dataSelectorMap.getValue( query );
 	}
-/*
-	private Object getElement( String cssQuery )
-	{
-		String[] queryTrace = cssQuery.split( QUERY_PART_DELIMITER );
-		Object currentObject = document;
-
-		for ( String queryStage : queryTrace )
+	/*
+		private Object getElement( String cssQuery )
 		{
-			currentObject = select( ( JSONObject ) currentObject, queryStage );
-		}
+			String[] queryTrace = cssQuery.split( QUERY_PART_DELIMITER );
+			Object currentObject = document;
 
-		return currentObject;
-	}
-*/
+			for ( String queryStage : queryTrace )
+			{
+				currentObject = select( ( JSONObject ) currentObject, queryStage );
+			}
+
+			return currentObject;
+		}
+	*/
 	public String getDocument( )
 	{
 		return document.toString( );
 	}
-/*
-	private Object select( JSONObject source, String queryStage )
-	{
-		String[] queryParts = queryStage.split( "/" );
-
-		String objectName = queryParts[ 0 ];
-		if ( queryParts.length > 1 )
+	/*
+		private Object select( JSONObject source, String queryStage )
 		{
-			int index = Integer.parseInt( queryParts[ 1 ] );
+			String[] queryParts = queryStage.split( "/" );
 
-			JSONArray array = ( JSONArray ) source.get( objectName );
-			return array.get( index );
+			String objectName = queryParts[ 0 ];
+			if ( queryParts.length > 1 )
+			{
+				int index = Integer.parseInt( queryParts[ 1 ] );
+
+				JSONArray array = ( JSONArray ) source.get( objectName );
+				return array.get( index );
+			}
+			else
+			{
+				return source.get( objectName );
+			}
 		}
-		else
-		{
-			return source.get( objectName );
-		}
-	}
-*/
+	*/
 	private String readDataFromUrl( String urlToRead )
 			throws IOException
 	{

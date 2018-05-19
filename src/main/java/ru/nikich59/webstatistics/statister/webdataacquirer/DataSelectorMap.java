@@ -29,7 +29,7 @@ public class DataSelectorMap
 		setElement( query, value );
 	}
 
-	private Object getElement( String cssQuery )
+	public Object getElement( String cssQuery )
 	{
 		String[] queryTrace = cssQuery.split( QUERY_PART_DELIMITER );
 		Object currentObject = map;
