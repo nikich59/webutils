@@ -19,6 +19,11 @@ public class WebDataAcquirerJSON implements WebDataAcquirer
 	private String url = "";
 	private JSONObject document;
 
+	public void setElement( JSONObject element )
+	{
+		this.document = element;
+	}
+
 	public WebDataAcquirerJSON( String url )
 	{
 		this.url = url;
