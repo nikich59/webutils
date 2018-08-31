@@ -5,6 +5,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.util.Map;
+
 
 /**
  * Created by Nikita on 24.12.2017.
@@ -12,164 +14,180 @@ import org.jsoup.nodes.Element;
 
 public class WebDataAcquirerXML implements WebDataAcquirer
 {
-    public static final String QUERY_PART_SEPARATOR = " ";
-    public static final String QUERY_INDEX_PREFIX = "$index$";
-    public static final String QUERY_ATTRIBUTE_PREFIX = "$attr$";
+	public static final String QUERY_PART_SEPARATOR = " ";
+	public static final String QUERY_INDEX_PREFIX = "$index$";
+	public static final String QUERY_ATTRIBUTE_PREFIX = "$attr$";
 
 
-    private String url = "";
-    private Document document;
+	private String url = "";
+	private Document document;
 
-    public void setElement( Element element )
-    {
-        this.element = element;
-    }
+	public void setElement( Element element )
+	{
+		this.element = element;
+	}
 
-    private Element element = null;
+	private Element element = null;
 
-    public WebDataAcquirerXML( String url )
-    {
-        this.url = url;
-    }
+	public WebDataAcquirerXML( String url )
+	{
+		this.url = url;
+	}
 
-    @Override
-    public WebDataAcquirerXML acquireData( )
-            throws AcquiringException
-    {
-        try
-        {
-            document = Jsoup.connect( url ).get( );
-        }
-        catch ( Exception e )
-        {
-            throw new AcquiringException( e.toString( ) );
-        }
+	@Override
+	public WebDataAcquirerXML acquireData( )
+			throws AcquiringException
+	{
+		try
+		{
+			document = Jsoup.connect( url ).get( );
+		}
+		catch ( Exception e )
+		{
+			throw new AcquiringException( e.toString( ) );
+		}
 
-        return this;
-    }
+		return this;
+	}
 
-    public Element getElement( String query )
-    {
-        String currentQuery = "";
-        Element currentElement = document;
-        if ( this.element != null )
-        {
-            currentElement = element;
-        }
+	@Override
+	public WebDataAcquirerXML acquireDataPost( Map < String, String > payload )
+			throws AcquiringException
+	{
+		try
+		{
+			document = Jsoup.connect( url ).data( payload ).post( );
+		}
+		catch ( Exception e )
+		{
+			throw new AcquiringException( e.toString( ) );
+		}
 
-        if ( query.isEmpty( ) )
-        {
-            return currentElement;
-        }
+		return this;
+	}
 
-        String[] queryParts = query.split( QUERY_PART_SEPARATOR );
+	public Element getElement( String query )
+	{
+		String currentQuery = "";
+		Element currentElement = document;
+		if ( this.element != null )
+		{
+			currentElement = element;
+		}
 
-        if ( queryParts.length == 0 )
-        {
-            return currentElement;
-        }
+		if ( query.isEmpty( ) )
+		{
+			return currentElement;
+		}
+
+		String[] queryParts = query.split( QUERY_PART_SEPARATOR );
+
+		if ( queryParts.length == 0 )
+		{
+			return currentElement;
+		}
 
 
-        for ( String queryPart : queryParts )
-        {
-            if ( queryPart.startsWith( QUERY_INDEX_PREFIX ) )
-            {
-                int index = Integer.parseInt( queryPart.substring( QUERY_INDEX_PREFIX.length( ) ) );
+		for ( String queryPart : queryParts )
+		{
+			if ( queryPart.startsWith( QUERY_INDEX_PREFIX ) )
+			{
+				int index = Integer.parseInt( queryPart.substring( QUERY_INDEX_PREFIX.length( ) ) );
 
-                currentElement = currentElement.select( currentQuery ).get( index );
+				currentElement = currentElement.select( currentQuery ).get( index );
 
-                currentQuery = "";
+				currentQuery = "";
 
-                continue;
-            }
+				continue;
+			}
 
-            if ( queryPart.startsWith( QUERY_ATTRIBUTE_PREFIX ) )
-            {
-                String attributeName = queryPart.substring( QUERY_ATTRIBUTE_PREFIX.length( ) );
+			if ( queryPart.startsWith( QUERY_ATTRIBUTE_PREFIX ) )
+			{
+				String attributeName = queryPart.substring( QUERY_ATTRIBUTE_PREFIX.length( ) );
 
-                if ( currentQuery.isEmpty( ) )
-                {
-                    return null;
-                }
+				if ( currentQuery.isEmpty( ) )
+				{
+					return null;
+				}
 
-                currentElement = currentElement.selectFirst( currentQuery );
+				currentElement = currentElement.selectFirst( currentQuery );
 
-                return null;
-            }
+				return null;
+			}
 
-            currentQuery += QUERY_PART_SEPARATOR + queryPart;
-        }
+			currentQuery += QUERY_PART_SEPARATOR + queryPart;
+		}
 
-        if ( ! currentQuery.isEmpty( ) )
-        {
-            currentElement = currentElement.selectFirst( currentQuery );
-        }
+		if ( ! currentQuery.isEmpty( ) )
+		{
+			currentElement = currentElement.selectFirst( currentQuery );
+		}
 
-        return currentElement;
-    }
+		return currentElement;
+	}
 
-    @Override
-    public String getValue( String query )
-    {
-        if ( query.isEmpty( ) )
-        {
-            return "";
-        }
+	@Override
+	public String getValue( String query )
+	{
+		if ( query.isEmpty( ) )
+		{
+			return "";
+		}
 
-        String[] queryParts = query.split( QUERY_PART_SEPARATOR );
+		String[] queryParts = query.split( QUERY_PART_SEPARATOR );
 
-        if ( queryParts.length == 0 )
-        {
-            return "";
-        }
+		if ( queryParts.length == 0 )
+		{
+			return "";
+		}
 
-        String currentQuery = "";
-        Element currentElement = document;
+		String currentQuery = "";
+		Element currentElement = document;
 
-        for ( String queryPart : queryParts )
-        {
-            if ( queryPart.startsWith( QUERY_INDEX_PREFIX ) )
-            {
-                int index = Integer.parseInt( queryPart.substring( QUERY_INDEX_PREFIX.length( ) ) );
+		for ( String queryPart : queryParts )
+		{
+			if ( queryPart.startsWith( QUERY_INDEX_PREFIX ) )
+			{
+				int index = Integer.parseInt( queryPart.substring( QUERY_INDEX_PREFIX.length( ) ) );
 
-                currentElement = currentElement.select( currentQuery ).get( index );
+				currentElement = currentElement.select( currentQuery ).get( index );
 
-                currentQuery = "";
+				currentQuery = "";
 
-                continue;
-            }
+				continue;
+			}
 
-            if ( queryPart.startsWith( QUERY_ATTRIBUTE_PREFIX ) )
-            {
-                String attributeName = queryPart.substring( QUERY_ATTRIBUTE_PREFIX.length( ) );
+			if ( queryPart.startsWith( QUERY_ATTRIBUTE_PREFIX ) )
+			{
+				String attributeName = queryPart.substring( QUERY_ATTRIBUTE_PREFIX.length( ) );
 
-                if ( currentQuery.isEmpty( ) )
-                {
-                    return currentElement.attr( attributeName );
-                }
+				if ( currentQuery.isEmpty( ) )
+				{
+					return currentElement.attr( attributeName );
+				}
 
-                currentElement = currentElement.selectFirst( currentQuery );
+				currentElement = currentElement.selectFirst( currentQuery );
 
-                return currentElement.attr( attributeName );
-            }
+				return currentElement.attr( attributeName );
+			}
 
-            currentQuery += QUERY_PART_SEPARATOR + queryPart;
-        }
+			currentQuery += QUERY_PART_SEPARATOR + queryPart;
+		}
 
-        if ( ! currentQuery.isEmpty( ) )
-        {
-            currentElement = currentElement.selectFirst( currentQuery );
-        }
+		if ( ! currentQuery.isEmpty( ) )
+		{
+			currentElement = currentElement.selectFirst( currentQuery );
+		}
 
-        if ( currentElement == null )
-        {
-            return "";
-        }
-        return currentElement.html( );
-    }
+		if ( currentElement == null )
+		{
+			return "";
+		}
+		return currentElement.html( );
+	}
 
-    public String getDocument( )
-    {
-        return document.toString( );
-    }
+	public String getDocument( )
+	{
+		return document.toString( );
+	}
 }
