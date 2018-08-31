@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * Created by Nikita on 25.12.2017.
@@ -36,6 +37,23 @@ public class WebDataAcquirerJSON implements WebDataAcquirer
 		try
 		{
 			String data = readDataFromUrl( url );
+			document = ( JSONObject ) new JSONParser( ).parse( data );
+		}
+		catch ( Exception e )
+		{
+			throw new AcquiringException( e.getMessage( ) );
+		}
+
+		return this;
+	}
+
+	@Override
+	public WebDataAcquirerJSON acquireDataPost( Map < String, String > payload )
+			throws AcquiringException
+	{
+		try
+		{
+			String data = readDataFromUrlPost( url );
 			document = ( JSONObject ) new JSONParser( ).parse( data );
 		}
 		catch ( Exception e )
@@ -104,6 +122,23 @@ public class WebDataAcquirerJSON implements WebDataAcquirer
 		URL url = new URL( urlToRead );
 		HttpURLConnection conn = ( HttpURLConnection ) url.openConnection( );
 		conn.setRequestMethod( "GET" );
+		BufferedReader rd = new BufferedReader( new InputStreamReader( conn.getInputStream( ) ) );
+		String line;
+		while ( ( line = rd.readLine( ) ) != null )
+		{
+			result.append( line );
+		}
+		rd.close( );
+		return result.toString( );
+	}
+
+	private String readDataFromUrlPost( String urlToRead )
+			throws IOException
+	{
+		StringBuilder result = new StringBuilder( );
+		URL url = new URL( urlToRead );
+		HttpURLConnection conn = ( HttpURLConnection ) url.openConnection( );
+		conn.setRequestMethod( "POST" );
 		BufferedReader rd = new BufferedReader( new InputStreamReader( conn.getInputStream( ) ) );
 		String line;
 		while ( ( line = rd.readLine( ) ) != null )
