@@ -136,7 +136,7 @@ public class WebDataAcquirerJSON implements WebDataAcquirer
 	{
 		StringBuilder result = new StringBuilder( );
 		URL url = new URL( urlToRead );
-		HttpURLConnection conn = ( HttpURLConnection ) url.openConnection( );
+		HttpURLConnection conn = ( HttpURLConnection ) url.openConnection( ).getHeaderFields();
 		conn.setRequestMethod( "POST" );
 
 		try ( OutputStream os = conn.getOutputStream( );
